@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import './App.css'
 import fetchJsonp from 'fetch-jsonp'
+import Navbar from './components/Navbar'
 
 const APIURL = `https://api.darksky.net/forecast/${process.env.REACT_APP_DARK_SKY}/`
 
@@ -15,6 +16,8 @@ class App extends Component {
       forecastKey: null,
     }
   }
+
+  handleForecastChange = forecastKey => this.setState({ forecastKey: forecastKey })
 
   componentDidMount() {
     navigator.geolocation.getCurrentPosition(position => {
@@ -31,7 +34,7 @@ class App extends Component {
   render() {
     const { weatherData, fetchingWeatherData, forecastKey } = this.state
     const forecast = weatherData[forecastKey]
-    console.log(forecast)
+    
     return (
       <div>
         <h1>Weather App</h1>
@@ -39,7 +42,7 @@ class App extends Component {
           <p>Loading...</p>
           :
           <div>
-            Forecast and Navbar go here
+            <Navbar changeForecast={this.handleForecastChange} />
           </div>
         }
       </div>
