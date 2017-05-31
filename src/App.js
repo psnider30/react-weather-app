@@ -2,6 +2,10 @@ import React, { Component } from 'react'
 import './App.css'
 import fetchJsonp from 'fetch-jsonp'
 import Navbar from './components/Navbar'
+import CurrentForecast from './components/CurrentForecast'
+import MinutelyForecast from './components/MinutelyForecast'
+import HourlyForecast from './components/HourlyForecast'
+import DailyForecast from './components/DailyForecast'
 
 const APIURL = `https://api.darksky.net/forecast/${process.env.REACT_APP_DARK_SKY}/`
 
@@ -36,13 +40,25 @@ class App extends Component {
     const forecast = weatherData[forecastKey]
     
     return (
-      <div>
+      <div className="App">
         <h1>Weather App</h1>
         {fetchingWeatherData ?
           <p>Loading...</p>
           :
           <div>
             <Navbar changeForecast={this.handleForecastChange} />
+            {forecastKey === 'currently' &&
+              <CurrentForecast forecast={forecast} />
+            }
+            {forecastKey === 'minutely' &&
+              <MinutelyForecast forecastData={forecast.data} />
+            }
+            {forecastKey === 'hourly' &&
+              <HourlyForecast forecastData={forecast.data} />
+            }
+            {forecastKey === 'daily' &&
+              <DailyForecast forecastData={forecast.data} />
+            }
           </div>
         }
       </div>
