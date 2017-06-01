@@ -2,7 +2,11 @@ import React, { Component } from 'react';
 import fetchJsonp from 'fetch-jsonp'
 import logo from './logo.svg';
 import './App.css';
-import CurrentForecast from './components/CurrentForecast'
+import Navbar from './components/Navbar'
+import Forecast from './components/Forecast'
+import MinutelyForecast from './components/MinutelyForecast'
+// import HourlyForecast from './components/HourlyForecast'
+import DailyForecast from './components/DailyForecast'
 
 const APIURL = `https://api.darksky.net/forecast/${process.env.REACT_APP_DARK_SKY_KEY}/`
 
@@ -12,11 +16,11 @@ class App extends Component {
 
     this.state = {
       fetchingData: true,
-      weatherData: {}
+      weatherData: {},
+      forecastKey: 'currently',
     }
   }
 
-  // How do I get my lat and long
   componentDidMount() {
     navigator.geolocation.getCurrentPosition(position => {
       const { latitude, longitude } = position.coords
@@ -30,9 +34,12 @@ class App extends Component {
     });
   }
 
+  handleForecastChange = forecastKey => this.setState({ forecastKey: forecastKey })
+
   render() {
-    const { fetchingData, weatherData } = this.state
-    console.log("The weather data is here: ", weatherData)
+    const { fetchingData, weatherData, forecastKey } = this.state
+    const forecast = weatherData[forecastKey]
+
     return (
       <div className="App">
         <div className="App-header">
@@ -43,7 +50,23 @@ class App extends Component {
             fetchingData ?
             <img src={logo} className="App-logo" alt="logo" />
             :
-            <CurrentForecast forecast={weatherData.currently} />
+            <div>
+              <Navbar changeForecast={this.handleForecastChange} />
+              {forecastKey === 'currently' && 
+                <div>
+                  <h2>Current Forecast</h2>
+                  <Forecast forecast={forecast} />
+                </div>
+              }
+              {forecastKey === 'minutely' && <MinutelyForecast forecastData={forecast.data} />}
+              {forecastKey === 'hourly' && 
+                <div>
+                  <h2>Hourly Forecast</h2>
+                  {forecast.data.map((forecast, index) => <Forecast key={index} forecast={forecast} />)}
+                </div>
+              }
+              {forecastKey === 'daily' && <DailyForecast forecastData={forecast.data} />}
+            </div>
           }
         </div>
       </div>
