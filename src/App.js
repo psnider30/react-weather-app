@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
+import fetchJsonp from 'fetch-jsonp'
 import logo from './logo.svg';
 import './App.css';
+import CurrentForecast from './components/CurrentForecast'
+
+const APIURL = `https://api.darksky.net/forecast/${process.env.REACT_APP_DARK_SKY_KEY}/`
 
 class App extends Component {
   constructor() {
@@ -11,23 +15,37 @@ class App extends Component {
       weatherData: {}
     }
   }
-  
+
+  // How do I get my lat and long
+  componentDidMount() {
+    navigator.geolocation.getCurrentPosition(position => {
+      const { latitude, longitude } = position.coords
+      
+      fetchJsonp(`${APIURL}${latitude},${longitude}`)
+        .then(response => response.json())
+        .then(weatherData => this.setState({ 
+          fetchingData: false,
+          weatherData 
+        }))
+    });
+  }
+
   render() {
-    const { fetchingData } = this.state
-    console.log(fetchingData)
+    const { fetchingData, weatherData } = this.state
+    console.log("The weather data is here: ", weatherData)
     return (
       <div className="App">
         <div className="App-header">
           <h2>Weather App</h2>
         </div>
-        <p className="App-intro">
+        <div className="App-intro">
           {
             fetchingData ?
             <img src={logo} className="App-logo" alt="logo" />
             :
-            <h1>Data is received</h1>
+            <CurrentForecast forecast={weatherData.currently} />
           }
-        </p>
+        </div>
       </div>
     );
   }
